@@ -58,10 +58,41 @@ Agents exist in a static environment (a model of Switzerland's road network) des
 The pickup and delivery problem is described by a series of tasks spread over the topology, the transportation tasks are described by: 
 
 \begin{enumerate}
-    \item Pickup city
-    \item Delivery city
+    \item Pickup city (and it's position)
+    \item Delivery city (and it's position)
     \item Reward in CHF
 \end{enumerate}
+
+\newpage
+
+\subsection{Definitions}
+
+\subsubsection{State} 
+It doesn't seem to make sense for the state to be anything other than \textbf{the city the agent is when it has no task}, this is because :
+\begin{enumerate}
+    \item An agent can not have more than one task
+    \item When an agent has a task it cannot interrupt it
+    \item There is no difference between an agent in a city with no task because it succeeded or because it failed it's last task, it still has to make a decision about how to get another task
+\end{enumerate}
+
+The set $S$ containing all states is exactly the set of all cities.
+
+\subsubsection{Action}
+An action consists in the agent either:
+\begin{enumerate}
+    \item going to a city with the goal of finding and completing a task there
+    \item taking a task in the city it's in
+\end{enumerate}
+And always result in the agent being in a city (different or not from it's starting point, the agent can loop between two city if it maximizes reward) without a task, in another words in a (new) state. \\
+
+The set $A$ containing all actions is ...
+\subsubsection{Reward}
+
+Where $i(a)$ is the starting city of a given task corresponding to a given action, $j(a)$ the city it ends in and $t(a)$ the time it takes to complete the task in case of a success.
+
+\[R(s,a) = \frac{ R(i(a),j(a)) }{t(a)}\]
+
+\subsubsection{Probability of transition $p(s'|s,a)$}
 
 \subsubsection{Existing tables}
 
@@ -72,10 +103,14 @@ The dataset usable for learning is described by two probability tables :
     \item $R_{table}(i,j)$ : the average reward given when a task is transported from city $i$ to city $j$
 \end{enumerate}
 
-\section{Solving MDP}
+\newpage
+
+\section{Solving the MDP}
 
 We denote \textit{the value of a state} $s$ as $V(s)$. This value represents "\textit{the potential rewards from this state onwards}". In order to ensure $V(s_i) < \infty$ $\forall i$ (and make the problem solvable) we introduce a \textit{discount factor} $\gamma \in [0 ... 1 [$.
 
 \[V(s_i) = R(s_i) + \gamma \cdot V(T(s_i),a(s_i))\]
+
+
 
 \end{document}
