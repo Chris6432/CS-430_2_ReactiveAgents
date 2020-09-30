@@ -1,0 +1,81 @@
+\documentclass[11pt]{article}
+
+\usepackage{sectsty}
+\usepackage{graphicx}
+\usepackage[T1]{fontenc}
+\usepackage{epigraph}
+\usepackage{amssymb}
+\usepackage{mathtools}
+
+%% declaring abs so that it works nicely
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}%
+\DeclarePairedDelimiter\norm{\lVert}{\rVert}%
+
+% Swap the definition of \abs* and \norm*, so that \abs
+% and \norm resizes the size of the brackets, and the 
+% starred version does not.
+\makeatletter
+\let\oldabs\abs
+\def\abs{\@ifstar{\oldabs}{\oldabs*}}
+%
+\let\oldnorm\norm
+\def\norm{\@ifstar{\oldnorm}{\oldnorm*}}
+\makeatother
+
+% Marges
+\topmargin=-0.45in
+\evensidemargin=0in
+\oddsidemargin=0in
+\textwidth=5.5in
+\textheight=9.0in
+\headsep=0.5in
+
+
+\title{Pickup and Delivery Reactive Agent: Implementation of MDP}
+\date{\today}
+\author{Christophe Marciot \& Titouan Renard}
+
+\begin{document}
+\maketitle	
+
+\section{Problem definition}
+
+\subsection{Markov Decision Process}
+
+In a MDP current state is know with certainty, but the reward of transition is not. A MDP is defined by : 
+
+\begin{align*}
+    \textit{A reward function:} && \overbrace{R(s,a) \rightarrow \mathbb{R}}^{\textit{Where $s$ denotes a state and $a$ an action}} \\
+    \textit{A probabilistic state transition table:} && \overbrace{T(s,a,s') = p(s'|s,a)}^{\textit{Where $s'$ denotes the state the action leads to}}
+\end{align*}
+
+The goal of the process is to find a policy $\pi$ such that \textit{the average reward is maximized}.
+
+\subsection{The Pickup and Delivery Problem}
+
+Agents exist in a static environment (a model of Switzerland's road network) described by a graph. Nodes of the graph are called \textit{cities} and it's (weighted) edges are called \textit{roads}. \\
+
+The pickup and delivery problem is described by a series of tasks spread over the topology, the transportation tasks are described by: 
+
+\begin{enumerate}
+    \item Pickup city
+    \item Delivery city
+    \item Reward in CHF
+\end{enumerate}
+
+\subsubsection{Existing tables}
+
+The dataset usable for learning is described by two probability tables :
+
+\begin{enumerate}
+    \item $P_{table}(i,j)$ : the probability of a task for city $j$ to be present in city $i$
+    \item $R_{table}(i,j)$ : the average reward given when a task is transported from city $i$ to city $j$
+\end{enumerate}
+
+\section{Solving MDP}
+
+We denote \textit{the value of a state} $s$ as $V(s)$. This value represents "\textit{the potential rewards from this state onwards}". In order to ensure $V(s_i) < \infty$ $\forall i$ (and make the problem solvable) we introduce a \textit{discount factor} $\gamma \in [0 ... 1 [$.
+
+\[V(s_i) = R(s_i) + \gamma \cdot V(T(s_i),a(s_i))\]
+
+\end{document}
