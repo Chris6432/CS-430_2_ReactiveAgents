@@ -1,6 +1,6 @@
 # Reactive Agents, CS-430 Assignement 2
 
-![screen](/Users/titouanrenard/Documents/etudes/EPFLMA1/IntelligentAgents/exercises/CS-430_2_ReactiveAgents/screen.png)
+![screen](screen.png)
 
 Implementation of a Markov Decision Process as an agent based solution for the pickup and delivery problem.
 
