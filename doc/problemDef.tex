@@ -32,7 +32,7 @@
 \headsep=0.5in
 
 
-\title{Pickup and Delivery Reactive Agent: Implementation of MDP}
+\title{Design of a Reactive Agent for the Pickup and Delivery Problem : Implementation of a Markov Decision Process}
 \date{\today}
 \author{Christophe Marciot \& Titouan Renard}
 
@@ -50,7 +50,7 @@ In a MDP current state is know with certainty, but the reward of transition is n
     \textit{A probabilistic state transition table:} && \overbrace{T(s,a,s') = p(s'|s,a)}^{\textit{Where $s'$ denotes the state the action leads to}}
 \end{align*}
 
-The goal of the process is to find a policy $\pi$ such that \textit{the average reward is maximized}.
+The goal of the process is to find a policy $\pi : S \rightarrow A$ (a mapping from state to action) such that \textit{the average reward is maximized}.
 
 \subsection{The Pickup and Delivery Problem}
 
@@ -113,12 +113,22 @@ We have, in order to ensure the convergence of $V(s)$ that :
 
 \[ \gamma \in [0,1[ \]
 
-We want our system to optimize for time, not for number of actions take. Because an action may take more or less time. So let's define our $\gamma$ as a function of an action :
+We want our system to optimize for time, not for number of actions take. Because an action may take more or less time. So let's define our $\gamma(a)$ not as a constant as a function of the action taken by the agent :
 
 \[\gamma (a) = \frac{ \underset{\alpha \in \text{ actions}}{\min} (t(\alpha))}{t(a)}\]
 
 
 \subsubsection{Probability of transition $p(s'|s,a)$}
+
+For a given action $a$ taken in the state $s$, the probability of ending up in the state $s'$ is given by :
+
+\[p(s'|s,a) = P_{table}(i(s'),j(s'))\]
+
+Where the state $s'$ is described by : 
+\begin{enumerate}
+    \item A city denoted $i(s')$
+    \item A contract to another city described by the city it goes to denoted $j(s')$
+\end{enumerate}
 
 
 \newpage
