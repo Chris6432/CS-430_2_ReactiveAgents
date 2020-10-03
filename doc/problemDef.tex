@@ -6,6 +6,7 @@
 \usepackage{epigraph}
 \usepackage{amssymb}
 \usepackage{mathtools}
+\usepackage{amsmath}
 
 %% declaring abs so that it works nicely
 \DeclarePairedDelimiter\abs{\lvert}{\rvert}%
@@ -77,24 +78,22 @@ The dataset usable for learning is described by two probability tables :
 \end{enumerate}
 
 \subsubsection{State} 
-It doesn't seem to make sense for the state to be anything other than \textbf{the city the agent is when it has no task}, this is because :
-\begin{enumerate}
-    \item An agent can not have more than one task
-    \item When an agent has a task it cannot interrupt it
-    \item There is no difference between an agent in a city with no task because it succeeded or because it failed it's last task, it still has to make a decision about how to get another task
-\end{enumerate}
+The state an agent is in can be described by :
 
-The set $S$ containing all states is exactly the set of all cities.
+\begin{enumerate}
+    \item the city it is in
+    \item the task there is in the city (or the absence thereof)
+\end{enumerate}
 
 \subsubsection{Action}
 An action consists in the agent either:
 \begin{enumerate}
-    \item going to another city with no tax
+    \item going to another city with no task
     \item taking a task in the city it's in (which amounts to moving to another city)
 \end{enumerate}
 And always result in the agent being in a city (different or not from it's starting point, the agent can loop between two city if it maximizes reward) without a task, in another words in a (new) state. \\
 
-The set $A$ containing all actions is the set of all pairs of two cities on the network.
+The set $A$ containing all actions is the set of all pairs of states.
 \subsubsection{Reward}
 
 Given a state $s$ the agent is in and for and action $a$, the reward function for a single action is defined as follows :
@@ -116,7 +115,8 @@ We have, in order to ensure the convergence of $V(s)$ that :
 
 We want our system to optimize for time, not for number of actions take. Because an action may take more or less time. So let's define our $\gamma$ as a function of an action :
 
-\[\gamma (a) = \frac{ \min_{\alpha \in \text{ actions}} (t(\alpha))}{t(a)}\]
+\[\gamma (a) = \frac{ \underset{\alpha \in \text{ actions}}{\min} (t(\alpha))}{t(a)}\]
+
 
 \subsubsection{Probability of transition $p(s'|s,a)$}
 
