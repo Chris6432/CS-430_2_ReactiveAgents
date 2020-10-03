@@ -67,6 +67,15 @@ The pickup and delivery problem is described by a series of tasks spread over th
 
 \subsection{Definitions}
 
+\subsubsection{Existing tables}
+
+The dataset usable for learning is described by two probability tables :
+
+\begin{enumerate}
+    \item $P_{table}(i,j)$ : the probability of a task for city $j$ to be present in city $i$
+    \item $R_{table}(i,j)$ : the average reward given when a task is transported from city $i$ to city $j$
+\end{enumerate}
+
 \subsubsection{State} 
 It doesn't seem to make sense for the state to be anything other than \textbf{the city the agent is when it has no task}, this is because :
 \begin{enumerate}
@@ -80,28 +89,37 @@ The set $S$ containing all states is exactly the set of all cities.
 \subsubsection{Action}
 An action consists in the agent either:
 \begin{enumerate}
-    \item going to a city with the goal of finding and completing a task there
-    \item taking a task in the city it's in
+    \item going to another city with no tax
+    \item taking a task in the city it's in (which amounts to moving to another city)
 \end{enumerate}
 And always result in the agent being in a city (different or not from it's starting point, the agent can loop between two city if it maximizes reward) without a task, in another words in a (new) state. \\
 
-The set $A$ containing all actions is ...
+The set $A$ containing all actions is the set of all pairs of two cities on the network.
 \subsubsection{Reward}
 
-Where $i(a)$ is the starting city of a given task corresponding to a given action, $j(a)$ the city it ends in and $t(a)$ the time it takes to complete the task in case of a success.
+Given a state $s$ the agent is in and for and action $a$, the reward function for a single action is defined as follows :
 
-\[R(s,a) = \frac{ R(i(a),j(a)) }{t(a)}\]
+\[R_{action}(s,a) = \begin{cases}
+    0               & \textit{if the agent moves to a city without taking a contract} \\
+    R_{table}(i(a),j(a))    & \textit{if the agent moves to a city after taking a contract}
+\end{cases}\]
+
+\subsubsection{Reward}
+
+Where  $i(a)$ is the starting city of the action $a$ and $j(a)$ it's ending city, note that $i(a) = s$.
+
+\subsubsection{Discount factor}
+
+We have, in order to ensure the convergence of $V(s)$ that :
+
+\[ \gamma \in [0,1[ \]
+
+We want our system to optimize for time, not for number of actions take. Because an action may take more or less time. So let's define our $\gamma$ as a function of an action :
+
+\[\gamma (a) = \frac{ \min_{\alpha \in \text{ actions}} (t(\alpha))}{t(a)}\]
 
 \subsubsection{Probability of transition $p(s'|s,a)$}
 
-\subsubsection{Existing tables}
-
-The dataset usable for learning is described by two probability tables :
-
-\begin{enumerate}
-    \item $P_{table}(i,j)$ : the probability of a task for city $j$ to be present in city $i$
-    \item $R_{table}(i,j)$ : the average reward given when a task is transported from city $i$ to city $j$
-\end{enumerate}
 
 \newpage
 
