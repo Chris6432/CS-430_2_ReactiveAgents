@@ -122,7 +122,10 @@ We want our system to optimize for time, not for number of actions take. Because
 
 For a given action $a$ taken in the state $s$, the probability of ending up in the state $s'$ is given by :
 
-\[p(s'|s,a) = P_{table}(i(s'),j(s'))\]
+\[p(s'|s,a) = \begin{cases}
+    P_{table}(i(s'),j(s'))  & \text{if }i(s')=s' \\
+    0                       & \text{else}
+\end{cases}\]
 
 Where the state $s'$ is described by : 
 \begin{enumerate}
