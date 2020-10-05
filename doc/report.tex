@@ -7,7 +7,7 @@
 
 % put your group number and names in the author field
 \title{\bf Exercise 2: A Reactive Agent for the Pickup and Delivery Problem}
-\author{Group \textnumero: Student 1, Student 2}
+\author{Group \textnumero: 272257, 262609}
 
 % the report should not be longer than 3 pages
 
@@ -19,6 +19,24 @@
 \subsection{Representation Description}
 % describe how you design the state representation, the possible actions, the reward table and the probability transition table
 
+ 	The problem studied in this report is the classical pickup and delivery problem. We try here specifically to implement one agent (which will be reffered to as \emph{the truck} or the agent interchangibly from now on). Here we try to implement the truck as a reactive agent. 
+ 	To properly explain the comportment of the agent, we need to clearly state what are : \emph{the states}, \emph{the actions}, \emph{the reward table}, and \emph{the probability transition table}.
+ 	\begin{itemize}
+ 		\item[$\bullet$] The action: An action is a command that will be executed by the truck if it is chosen. In this impletation, actions are simply commands that to move from one city to another. In this fashion, we implement the actions as the class \emph{ActionMDP}, which comprises of two variables: one called \emph{startState}, that represents the city the truck is currently in, and one called \emph{endState}, that represents the city will be in if the truck chooses the given action.
+ 		
+ 		\item[$\bullet$] The state: The state represents the perception of the environnement by the truck is in at a given step. Remember that, as it gets to a city, the truck gets informed on the spot of if a contract to another city. In this fashion, we implement the state as a class comprising of two variables: one called \emph{city} which represents the city the truck is currently will, and one called \emph{action} which represents the action available to the truck when and if the truck arrives to that city.
+ 		
+ 		\item[$\bullet$] The reward table: The reward table, which is given, is a $\#States\times\#Actions$ table in which the cells contain the reward the agent will receive when choosing the given action if it is in the given state. In theory the cell contains a random variable, but here we consider only its expected value. The way we implement the reward table is the following. It is a method of the \emph{Reactive} (See logist's API to undertand why) called \emph{rewardFunction} that takes as parameters a state and an action (as described perviously) and gives back a \emph{Double} value. We then get that 
+ 			\begin{align*}
+ 				rewardFunction(s,a)= 
+ 					\begin{cases}
+ 						0 & \mathrm{if}\ a.startState.City\neq state.city,\\
+ 						r(s.city,a) & \mathrm{otherwise}
+					\end{cases}
+			\end{align*}
+where $r(s.city,a)$ is the entry in the reward table corresponding to the a given state $s$ and a given action $a$.
+ 		
+	\end{itemize}
 \subsection{Implementation Details}
 % describe the implementation details of the representations above and the implementation details of the reinforcement learning algorithm you implemented
 
