@@ -64,6 +64,8 @@ public class Reactive implements ReactiveBehavior {
 	private LinkedList<StateMDP> states;
 	private LinkedList<ActionMDP> actions;
 
+	private LinkedList<Double> V;
+
 
 
 	private LinkedList<StateMDP> generateStates(){
@@ -115,7 +117,7 @@ public class Reactive implements ReactiveBehavior {
 		this.states = this.generateStates();
 		this.actions = this.generateActions();
 		
-		LinkedList<Double> V = this.valIterate();
+		this.V = this.valIterate();
 
 		//System.out.println(this.actions.size());
 
@@ -129,6 +131,55 @@ public class Reactive implements ReactiveBehavior {
 			}
 		}*/
 
+	}
+
+	private ActionMDP policy(StateMDP st){
+		Double max = 0.0;
+		ActionMDP act = new ActionMDP(st, st);
+
+		for (ActionMDP ac : this.actions){
+			Double val = this.rewardFunction(st, ac);
+			Double sum = 0.0;
+			int cnt = 0;
+			for (StateMDP stp: this.states){
+				sum = sum + this.pPickup * this.transitionProbabilities(ac,stp)*this.V.get(cnt);
+				cnt +=1;
+			}
+			val += sum;
+			if (val > max){
+				max = val;
+				act = ac;
+			}
+		}
+
+		return act;
+	}
+
+	private StateMDP computeState(Vehicle vehicle,  Task availableTask){
+		if (availableTask == null){
+			return new StateMDP(vehicle.getCurrentCity(), vehicle.getCurrentCity());
+		}
+		else{
+			return new StateMDP(vehicle.getCurrentCity(), availableTask.deliveryCity);
+		}
+	}
+
+	private Action decideAction(ActionMDP ac,Task availableTask){
+		Action action;
+		if(availableTask == null){
+			action = new Move(ac.endState.city);
+		}
+		else if(ac.endState.city == availableTask.deliveryCity){
+			action = new Pickup(availableTask);
+		}
+		else{
+			action = new Move(ac.endState.city);
+			
+		}
+
+		return action;
+		//action = new Move(currentCity.randomNeighbor(random));
+		//action = new Pickup(availableTask);
 	}
 
 	private Double max(LinkedList<Double> list){
@@ -159,7 +210,8 @@ public class Reactive implements ReactiveBehavior {
 			V.add(0.0);
 		}
 
-		for(int i = 0; i < 100; i++){ // loop until good enough, replace with a while some end-condition
+		System.out.println("Solving MDP");
+		for(int i = 0; i < 1; i++){ // loop until good enough, replace with a while and some end-condition
 			int cnt = 0;
 			for(StateMDP st : this.states){
 				LinkedList<Double> Q = new LinkedList<Double>();
@@ -171,7 +223,7 @@ public class Reactive implements ReactiveBehavior {
 			}
 
 		}
-
+		System.out.println("Sim ready to run");
 		return V;
 	}
 
@@ -196,15 +248,28 @@ public class Reactive implements ReactiveBehavior {
 
 	@Override
 	public Action act(Vehicle vehicle, Task availableTask) {
-		Action action;
+		
 
+		StateMDP st = this.computeState(vehicle, availableTask);
+
+		ActionMDP ac = this.policy(st);
+
+		Action action = this.decideAction(ac, availableTask);
+		
+		System.out.println("Setp number : " + numActions + ";");
+		System.out.println("State is : " + st + ";");
+		System.out.println("Action is : " + ac + ";");
+
+
+
+		/*
 		if (availableTask == null || random.nextDouble() > pPickup) {
 			City currentCity = vehicle.getCurrentCity();
 			action = new Move(currentCity.randomNeighbor(random));
 		} else {
 			action = new Pickup(availableTask);
 		}
-		
+		*/
 		if (numActions >= 1) {
 			System.out.println("The total profit after "+numActions+" actions is "+myAgent.getTotalProfit()+" (average profit: "+(myAgent.getTotalProfit() / (double)numActions)+")");
 		}
