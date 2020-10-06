@@ -228,7 +228,7 @@ public class Reactive implements ReactiveBehavior {
 			LinkedList<Double> diff = new LinkedList<Double>();
 			
 			for (int i = 0; i<this.states.size(); i++) {
-				diff.add(i,V.get(i)-VPrev.get(i));
+				diff.add(i, java.lang.Math.abs(V.get(i)-VPrev.get(i)));
 				VPrev.set(i, V.get(i));
 			}
 			ndiff = this.max(diff);
