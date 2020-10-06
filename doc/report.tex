@@ -7,7 +7,7 @@
 
 % put your group number and names in the author field
 \title{\bf Exercise 2: A Reactive Agent for the Pickup and Delivery Problem}
-\author{Group \textnumero: Student 1, Student 2}
+\author{Group \textnumero: 272257, 262609}
 
 % the report should not be longer than 3 pages
 
@@ -19,8 +19,36 @@
 \subsection{Representation Description}
 % describe how you design the state representation, the possible actions, the reward table and the probability transition table
 
-\subsection{Implementation Details}
+ 	The problem studied in this report is the classical pickup and delivery problem. We try here specifically to implement one agent (which will be reffered to as \emph{the truck} or the agent interchangibly from now on). Here we try to implement the truck as a reactive agent. 
+ 	To properly explain the comportment of the agent, we need to clearly state what are : \emph{the states}, \emph{the actions}, \emph{the reward table}, and \emph{the probability transition table}.
+ 	\begin{itemize}
+ 		 \item[$\bullet$] States: The state is supposed to represent the perception the agent has of the environnement. Once the agent finishes an action (see definition of actions), it observes two things: the city it arrived at and the contract given from the given city. We then design the states as having two attributes: the city the agent is currently in and the contract present. Note that \bold{the absence of contract is modelized by a contract from the current city to itself}.
+ 		 
+ 		 \item[$\bullet$] Actions: An action is designed as the movement from a city to another. Note that actions can move the agent from any city to any other one \bold{even if the two cities are not connected directly}.
+ 		 
+ 		 \item[$\bullet$] Reward table: The reward table is $\# States\times\# Actions$ table in which each cell contains the expected value of 
+ 		 
+\subsection{Implementation Details}.
 % describe the implementation details of the representations above and the implementation details of the reinforcement learning algorithm you implemented
+
+%Action
+In this impletation, we implement the actions as the class \emph{ActionMDP}, which comprises of two variables: one being \emph{City startState}, that represents the city the truck is currently in, andthe other \emph{City endState}, that represents the city will be in if the truck chooses the given action. Note that an action can take the agent from one node to another \bold{even if those two nodes are not connected}. 
+
+%State 
+ In this fashion, we implement the state as a class comprising of two variables: one called \emph{city} which represents the city the truck is currently will, and one called \emph{action} which represents the action available to the truck when and if the truck arrives to that city.
+ 
+ %Reward table
+ We then get that 
+ 			\begin{align*}
+ 				rewardFunction(s,a)= 
+ 					\begin{cases}
+ 						0 & \mathrm{if}\ a.startState\neq state.city,\\
+ 						r(s.city,a) & \mathrm{otherwise}
+					\end{cases}
+			\end{align*}
+where $r(s.city,a)$ is the entry in the reward table corresponding to the a given state $s$ and a given action $a$.
+ 
+ %Transition table
 
 \section{Results}
 % in this section, you describe several results from the experiments with your reactive agent
