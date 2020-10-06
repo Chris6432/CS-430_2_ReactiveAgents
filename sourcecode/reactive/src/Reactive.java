@@ -1,11 +1,6 @@
-package rla;
 
-import java.util.Random;
 
-import java.util.Iterator;
 import java.util.LinkedList;
-
-import mdpSolver.MDPSolver;
 
 import logist.simulation.Vehicle;
 import logist.agent.Agent;
@@ -53,7 +48,6 @@ class ActionMDP{
 
 public class Reactive implements ReactiveBehavior {
 
-	private Random random;
 	private double pPickup;
 	private int numActions;
 	private Agent myAgent;
@@ -201,7 +195,7 @@ public class Reactive implements ReactiveBehavior {
 		int cnt = 0;
 		for (StateMDP statePrime : this.states){
 			if(statePrime.city == action.endCity){
-				sum = sum + transitionProbabilities(st, action, statePrime) * V.get(cnt);
+				sum = sum + transitionProbabilities(state, action, statePrime) * V.get(cnt);
 			}
 			cnt = cnt + 1;
 		}
@@ -219,6 +213,7 @@ public class Reactive implements ReactiveBehavior {
 			VPrev.add(0.0);
 		}
 		
+		double ndiff; 
 		System.out.println("Solving MDP");
 		do { // loop until good enough, replace with a while and some end-condition
 			int count = 0;
@@ -227,16 +222,17 @@ public class Reactive implements ReactiveBehavior {
 				for(ActionMDP ac: this.actions){
 					Q.add(this.rewardFunction(st, ac)+this.pPickup* sumV(st, ac, V));
 				}
-				V.set(cnt,this.max(Q));
+				V.set(count,this.max(Q));
 				count++;
 			}
 			LinkedList<Double> diff = new LinkedList<Double>();
 			
-			for (int i = 0; i<this.states.size; i++) {
-				diff.set(i,abs(V.get(i)-VPrev.get(i)));
+			for (int i = 0; i<this.states.size(); i++) {
+				diff.add(i,V.get(i)-VPrev.get(i));
 				VPrev.set(i, V.get(i));
 			}
-		} while(this.max(diff) > 0.01*(1-this.pPickup)/(2*this.pPickup));
+			ndiff = this.max(diff);
+		} while(ndiff > 0.01*(1-this.pPickup)/(2*this.pPickup));
 	
 		System.out.println("Sim ready to run");
 		return V;
@@ -252,24 +248,25 @@ public class Reactive implements ReactiveBehavior {
 
 		this.topology = topology;
 		this.td = td;
-
-		this.random = new Random();
 		this.pPickup = discount;
 		this.numActions = 0;
 		this.myAgent = agent;
 
 		this.generatePolicy();
+		
 	}
 
 	//@Override
 	public Action act(Vehicle vehicle, Task availableTask) {
-		
+	
 
 		StateMDP st = this.computeState(vehicle, availableTask);
 
 		ActionMDP ac = this.policy(st);
 
 		Action action = this.decideAction(ac, availableTask);
+		
+		System.out.println("My name is" + vehicle.name());
 		
 		System.out.println("Setp number : " + numActions + ";");
 		System.out.println("State is : " + st + ";");
