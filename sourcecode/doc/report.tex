@@ -21,23 +21,23 @@
 \subsection{Representation Description}
 % describe how you design the state representation, the possible actions, the reward table and the probability transition table
 
- 	The problem studied in this report is the classical pickup and delivery problem. We try here specifically to implement one agent (which will be reffered to as \emph{the truck} or the agent interchangibly from now on). We try to implement the truck as a reactive agent. 
+ 	The problem studied in this report is the classical pickup and delivery problem. We try here specifically to implement one agent (which will be reffered to as \emph{the truck} or the agent interchangeably from now on). We try to implement the truck as a reactive agent. 
  	To properly explain the comportment of the agent, we need to clearly state what are : \emph{the states}, \emph{the actions}, \emph{the reward table}, and \emph{the probability transition table}.
  	\begin{itemize}
- 		 \item[$\bullet$] States: The state is supposed to represent the perception the agent has of the environnement. Once the agent finishes an action (see definition of actions), it observes two things: the city it arrived at and the contract given from the given city to a second one. We then design the states as having two attributes: the city the agent is currently in and the city the contract points to. Note that \textbf{the absence of contract is modelized by a contract from the current city to itself}.
+ 		 \item[$\bullet$] \textbf{States}: The state represents the perception that the agent has of it's environment. Once the agent finishes an action (see definition of actions), it observes two things: the city it arrived in and the task (or absence thereof) it may accept. In our implementation, the states are represented in memory by two attributes: the city the agent is currently in and the city the task points to. Note that \textbf{the absence of task is represented by a contract from the current city to itself}.
  		 
- 		 \item[$\bullet$] Actions: An action is designed as the movement from a city to another. Note that actions can move the agent from any city to any other one \textbf{even if the two cities are not connected directly}.
+ 		 \item[$\bullet$] \textbf{Actions}: An action is defined as the movement of the agent from a city to another. Note that actions can describe the movement of the agent from any city to any other one \textbf{even if the two cities are not connected directly}.
  		 
- 		 \item[$\bullet$] Reward table: The reward table is $\# States\times\# Actions$ table in which each cell gives us the reward given to the agent if it is in a given state and chooses a given action. For two cities $i$ and $j$, we are given the average reward of a contract from $i$ to $j$, which will be denoted $r(i,j)$ and thus each cell will either contain zero, if the departure city and arrival city of the state and the action do not coincide, either contain $r(i,j)$ if they do.
+ 		 \item[$\bullet$] \textbf{Reward table}: The reward table is a $\# States\times\# Actions$ table in which each cell gives us the reward given to the agent if it is in a given state and chooses a given action. For two cities $i$ and $j$, we are given the average reward of a contract from $i$ to $j$, which will be denoted $r(i,j)$ and thus each cell will either contain zero, if the departure city and arrival city of the state and the action do not coincide, either contain $r(i,j)$ if they do.
  		 
- 		 \item[$\bullet$] Probability transition table: The probability transition table is a $\# States\times\# Actions\times\# States$ table that gives us the probability of being in the state $s'$ if the action $a$ is performed in the state $s$. Note that if the city of departure of $a$ is not the current city of $s$ or the city of arrival of $a$ is not the current city of $s'$, then this probability is zero. Otherwise, we note that, since the city of the state of arrival is a deterministiic variable when given a state and an action, we see that the probability is only determined by the probability of the presence of a contract from the city of $s'$, $i$, to the city of arrival of the contract given in $s'$, $j$. These probabilites are a given datum of the problem, and will be denoted $p(i,j)$.
+ 		 \item[$\bullet$] \textbf{Probability transition table}: The probability transition table is a $\# States\times\# Actions\times\# States$ table that gives us the probability of being in the state $s'$ if the action $a$ is performed in the state $s$. Note that if the city of departure of $a$ is not the current city of $s$ or the city of arrival of $a$ is not the current city of $s'$, then this probability is zero. Otherwise, we note that, since the city of the state of arrival is a deterministic variable when given a state and an action, we see that the probability is only determined by the probability of the presence of a contract from the city of $s'$, $i$, to the city of arrival of the contract given in $s'$, $j$. These probabilities are a given datum of the problem, and will be denoted $p(i,j)$.
 	\end{itemize}
  		 
 \subsection{Implementation Details}.
 % describe the implementation details of the representations above and the implementation details of the reinforcement learning algorithm you implemented
 
 
-In this impletation, we implement the actions as the class \emph{ActionMDP}, which comprises of two attributes: the first being \emph{City startCity} that represents the city the truck is currently in and an other \emph{City endCity} that represents the city will be in if the truck chooses the given action.
+In this implementation, we implement the actions as the class \emph{ActionMDP}, which comprises of two attributes: the first being \emph{City startCity} that represents the city the truck is currently in and an other \emph{City endCity} that represents the city will be in if the truck chooses the given action.
 
 We implement the states as the class \emph{StateMDP}, which comprises of two attributes: the first being \emph{City city} that represents the city the agent is currently in and the second being \emph{City task} that represents the arrival city of the current task.
 
@@ -51,7 +51,7 @@ We implement the reward table as a method of the \emph{Reactive} class, \emph{re
 	\end{align*}
 where $r(s.city,a.endCity)$  is given above.
  
-We implement the probability transition table with a method of the \emph{Reactive} class, \emph{transitionProbabilities(StateMDP startState, ActionMDP action, StateMDP endState)}, which for given states $s,s'$ adn an action $a$ gives us the following output:
+We implement the probability transition table as a method of the \emph{Reactive} class, \emph{transitionProbabilities(StateMDP startState, ActionMDP action, StateMDP endState)}, which for given states $s,s'$ and an action $a$ gives us the following output:
 	\begin{align*}
 		transitionProbabilities(s,a,s')=
 			\begin{cases}
@@ -60,13 +60,14 @@ We implement the probability transition table with a method of the \emph{Reactiv
 			\end{cases}
 	\end{align*}
 where $p(s'.city,s'.task)$ is defined above.
-At a given state $s$, the action performed by the agent is given by the formula $$\pi(s)=\mathrm{argmax}_a\left\{rewardFunction(s,a)+\gamma\sum\limits_{s'\in S}transitionProbabilities(s,a,s')V(s')\right\}$$ where $S$ is the set of states, $\gamma$ is the discount factor, which is also a given datum of the proble, and $V(s)$ is the rewards that can be reached from the state $s$ using an optimal choice of actions. Note that the values $V(s)$ are thus given recursively by $$V(s) = \mathrm{max}_a\left\{rewardFunction(s,a)+\gamma\sum\limits_{s'\in S}transitionProbabilities(s,a,s')V(s')\right\}.$$ We use algorithm seen in class to approximate those values since this is actually a \textbf{Markov dscision process} as the state transitions are not deterministic but we can analyze the current state with certainty:
+At a given state $s$, the action performed by the agent is given by the formula $$\pi(s)=\mathrm{argmax}_a\left\{rewardFunction(s,a)+\gamma\sum\limits_{s'\in S}transitionProbabilities(s,a,s')V(s')\right\}$$ where $S$ is the set of states, $\gamma$ is the discount factor, which is also a given datum of the proble, and $V(s)$ is the rewards that can be reached from the state $s$ using an optimal choice of actions, this is implemented as the \emph{policy} method of the \emph{Reactive} class. Note that the values $V(s)$ are thus given recursively by $$V(s) = \mathrm{max}_a\left\{rewardFunction(s,a)+\gamma\sum\limits_{s'\in S}transitionProbabilities(s,a,s')V(s')\right\}.$$ We use algorithm seen in class to approximate those values since this is actually a \textbf{Markov decision process} as the state transitions are not deterministic but we can analyze the current state with certainty:
 	\begin{algorithm}[H]
 		\SetAlgoLined
 		%\Kwresult{A set of values V(s)}
-	 	initialization: Set $V(s)$ and $V_{prev}(s)$ arbitrarly but in an equal way.\\	
+	 	initialization: Set $V(s)$ arbitrary and $\infty \rightarrow V_{prev}(s)$ .\\	
 	 	\While{$\mathrm{max}_s|V(s)-V_{prev}(s)| > \frac{0.01*(1-\gamma)}{2\gamma}$}{
 	 		\For{$s\in S$}{
+				$V(s) \rightarrow V_{prev}(s)$ \\
 	 			\For{$a\in A$}{
 	 				$Q(s,a) \leftarrow rewardFunction(s,a)+\gamma\sum_{s'\in S}transitionProbabilities(s,a,s')V(s')$
 				}
@@ -75,7 +76,7 @@ At a given state $s$, the action performed by the agent is given by the formula 
 		}
 		\caption{Solving the MDP}
 	\end{algorithm}
-where $A$ is the set of actions. Note that this algoritms terminates since the set of rewards is finite and thus bounded. Also note that the number in the while condition is here to assure that when the algorithm terminates we have $\mathrm{max}_s|V(s)-V^*(s)| < 0.01$, where $V^*(s)$ is the \emph{true value of the state $s$}, the latter being the value we want to approximate.
+where $A$ is the set of actions. Note that this algorithms terminates since the set of rewards is finite and thus bounded. Also note that the number in the while condition is here to assure that when the algorithm terminates we have $\mathrm{max}_s|V(s)-V^*(s)| < \epsilon = 0.01$, where $V^*(s)$ is the \emph{true value of the state $s$}, the latter being the value we want to approximate.
 
 \section{Results}
 % in this section, you describe several results from the experiments with your reactive agent
