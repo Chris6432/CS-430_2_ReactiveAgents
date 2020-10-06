@@ -167,12 +167,15 @@ public class Reactive implements ReactiveBehavior {
 	private Action decideAction(ActionMDP ac,Task availableTask){
 		Action action;
 		if(availableTask == null){
+			System.out.println("NO TASK,  path to " + ac.endState);
 			action = new Move(ac.startState.pathTo(ac.endState).get(0));
 		}
 		else if(ac.endState == availableTask.deliveryCity){
+			System.out.println("ACCEPTED, path to " + ac.endState);
 			action = new Pickup(availableTask);
 		}
 		else{
+			System.out.println("REJECTED, path to " + ac.endState);
 			System.out.println(ac.startState.pathTo(ac.endState));
 			action = new Move(ac.startState.pathTo(ac.endState).get(0));
 			
@@ -212,7 +215,7 @@ public class Reactive implements ReactiveBehavior {
 		}
 
 		System.out.println("Solving MDP");
-		for(int i = 0; i < 20; i++){ // loop until good enough, replace with a while and some end-condition
+		for(int i = 0; i < 100; i++){ // loop until good enough, replace with a while and some end-condition
 			int cnt = 0;
 			for(StateMDP st : this.states){
 				LinkedList<Double> Q = new LinkedList<Double>();
@@ -257,9 +260,9 @@ public class Reactive implements ReactiveBehavior {
 
 		Action action = this.decideAction(ac, availableTask);
 		
-		System.out.println("Setp number : " + numActions + ";");
-		System.out.println("State is : " + st + ";");
-		System.out.println("Action is : " + ac + ";");
+		//System.out.println("Setp number : " + numActions + ";");
+		//System.out.println("State is : " + st + ";");
+		//System.out.println("Action is : " + ac + ";");
 
 
 
@@ -271,9 +274,9 @@ public class Reactive implements ReactiveBehavior {
 			action = new Pickup(availableTask);
 		}
 		*/
-		if (numActions >= 1) {
-			System.out.println("The total profit after "+numActions+" actions is "+myAgent.getTotalProfit()+" (average profit: "+(myAgent.getTotalProfit() / (double)numActions)+")");
-		}
+		//if (numActions >= 1) {
+			//System.out.println("The total profit after "+numActions+" actions is "+myAgent.getTotalProfit()+" (average profit: "+(myAgent.getTotalProfit() / (double)numActions)+")");
+		//}
 		numActions++;
 		
 		return action;
