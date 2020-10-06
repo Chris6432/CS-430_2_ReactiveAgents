@@ -37,17 +37,17 @@ class StateMDP{
 }
 
 class ActionMDP{
-	public logist.topology.Topology.City startState;
-	public logist.topology.Topology.City endState;
+	public logist.topology.Topology.City startCity;
+	public logist.topology.Topology.City endCity;
 
 	public ActionMDP(logist.topology.Topology.City start, logist.topology.Topology.City end){
-		this.startState = start;
-		this.endState = end;
+		this.startCity = start;
+		this.endCity = end;
 	}
 
 	@Override
 	public String toString() {
-		return "Action from : " + this.startState + " to : " + this.endState;
+		return "Action from : " + this.startCity + " to : " + this.endCity;
 	}
 }
 
@@ -94,18 +94,23 @@ public class Reactive implements ReactiveBehavior {
 		return actionsGen;
 	}
 
-	private Double transitionProbabilities(ActionMDP action,StateMDP endState){ // this definition is actually fucked up, but at least it compiles
-		if(endState.city != action.endState){
-			return 0.0;
+	private Double transitionProbabilities(StateMDP startState, ActionMDP action,StateMDP endState){ // this definition is actually fucked up, but at least it compiles
+		double probability;
+		
+		if (startState.city != action.startCity || endState.city != action.endCity) {
+			probability = 0.0;
 		}
-		else{
-			return this.td.probability(endState.city,endState.task);
+		
+		else {
+			probability = td.probability(endState.city,endState.task);
 		}
+		
+		return probability;
 	}
 
 	private Double rewardFunction(StateMDP startState, ActionMDP action){
-		if(startState.task == action.endState){
-			return (double) this.td.weight(action.startState,action.endState);
+		if(startState.task == action.endCity){
+			return (double) this.td.reward(action.startCity,action.endCity);
 		}
 		else{
 			return 0.0;
@@ -127,7 +132,7 @@ public class Reactive implements ReactiveBehavior {
 
 		/*for (StateMDP st : this.states) {
 			for (ActionMDP ac: this.actions) {
-				System.out.println("transition pr from "+ ac.startState +" to "+ac.endState+" is : "+transitionProbabilities(ac, st));
+				System.out.println("transition pr from "+ ac.startCity +" to "+ac.endCity+" is : "+transitionProbabilities(ac, st));
 			}
 		}*/
 
@@ -142,11 +147,11 @@ public class Reactive implements ReactiveBehavior {
 			Double sum = 0.0;
 			int cnt = 0;
 			for (StateMDP stp: this.states){
-				sum = sum + this.pPickup * this.transitionProbabilities(ac,stp)*this.V.get(cnt);
+				sum += this.pPickup * this.transitionProbabilities(st,ac,stp)*this.V.get(cnt);
 				cnt +=1;
 			}
 			val += sum;
-			if (val > max && ac.startState == st.city){
+			if (val > max && ac.startCity == st.city){
 				max = val;
 				act = ac;
 			}
@@ -167,14 +172,14 @@ public class Reactive implements ReactiveBehavior {
 	private Action decideAction(ActionMDP ac,Task availableTask){
 		Action action;
 		if(availableTask == null){
-			action = new Move(ac.startState.pathTo(ac.endState).get(0));
+			action = new Move(ac.startCity.pathTo(ac.endCity).get(0));
 		}
-		else if(ac.endState == availableTask.deliveryCity){
+		else if(ac.endCity == availableTask.deliveryCity){
 			action = new Pickup(availableTask);
 		}
 		else{
-			System.out.println(ac.startState.pathTo(ac.endState));
-			action = new Move(ac.startState.pathTo(ac.endState).get(0));
+			System.out.println(ac.startCity.pathTo(ac.endCity));
+			action = new Move(ac.startCity.pathTo(ac.endCity).get(0));
 			
 		}
 
@@ -195,8 +200,8 @@ public class Reactive implements ReactiveBehavior {
 		Double sum = 0.0;
 		int cnt = 0;
 		for (StateMDP statePrime : this.states){
-			if(statePrime.city == action.endState){
-				sum = sum + transitionProbabilities(action, statePrime) * V.get(cnt);
+			if(statePrime.city == action.endCity){
+				sum = sum + transitionProbabilities(st, action, statePrime) * V.get(cnt);
 			}
 			cnt = cnt + 1;
 		}
@@ -206,24 +211,33 @@ public class Reactive implements ReactiveBehavior {
 
 	private LinkedList<Double> valIterate(){
 		LinkedList<Double> V = new LinkedList<Double>();
-
+		LinkedList<Double> VPrev = new LinkedList<Double>();
+		
+		
 		for(StateMDP st : this.states){
 			V.add(0.0);
+			VPrev.add(0.0);
 		}
-
+		
 		System.out.println("Solving MDP");
-		for(int i = 0; i < 20; i++){ // loop until good enough, replace with a while and some end-condition
-			int cnt = 0;
+		do { // loop until good enough, replace with a while and some end-condition
+			int count = 0;
 			for(StateMDP st : this.states){
 				LinkedList<Double> Q = new LinkedList<Double>();
 				for(ActionMDP ac: this.actions){
 					Q.add(this.rewardFunction(st, ac)+this.pPickup* sumV(st, ac, V));
 				}
 				V.set(cnt,this.max(Q));
-				cnt = cnt + 1;
+				count++;
 			}
-
-		}
+			LinkedList<Double> diff = new LinkedList<Double>();
+			
+			for (int i = 0; i<this.states.size; i++) {
+				diff.set(i,abs(V.get(i)-VPrev.get(i)));
+				VPrev.set(i, V.get(i));
+			}
+		} while(this.max(diff) > 0.01*(1-this.pPickup)/(2*this.pPickup));
+	
 		System.out.println("Sim ready to run");
 		return V;
 	}
@@ -247,7 +261,7 @@ public class Reactive implements ReactiveBehavior {
 		this.generatePolicy();
 	}
 
-	@Override
+	//@Override
 	public Action act(Vehicle vehicle, Task availableTask) {
 		
 
