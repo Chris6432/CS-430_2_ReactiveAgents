@@ -2,6 +2,7 @@
 
 \usepackage{amsmath}
 \usepackage{textcomp}
+\usepackage{graphicx}     
 \usepackage[top=0.8in, bottom=0.8in, left=0.8in, right=0.8in]{geometry}
 % add other packages here
 
@@ -81,7 +82,33 @@ where $A$ is the set of actions. Note that this algorithms terminates since the 
 \section{Results}
 % in this section, you describe several results from the experiments with your reactive agent
 
-\subsection{Experiment 1: Discount factor}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.4\textwidth]{figures/random_vs_mdp.png}
+	\includegraphics[width=0.4\textwidth]{figures/random_vs_mdp.png}
+	\caption{\textbf{Left :} evolution over time of the average reward per kilometer for a reactive MDP agent (in blue, with a discount factor of $0.85$) and a dummy agent (that takes random decisions, in red). \textbf{Right :} Similar plot for the evolution of rabbit (red) and grass (green) population equilibriums as the grass growth rate changes.}
+\end{figure}
+
+\subsection{Experiment 1: Comparisons with dummy agents}
+% you compare the results of your agent with two dummy agents: the random agent that was already given in the starter files and another dummy agent that you define and create. You should report the results from the simulations using the topologies given in the starter files and optionally, additional topologies that you create.
+We compare one of our \emph{MDP} reactive agents (with a discount factor $\gamma = 0.85$) to a randomly action agent shows a clear performance difference, the topology is a model of France's road network.
+% you describe how you perform the experiment and you describe the dummy agent you created (you also need to specify the configuration used for the experiment)
+
+\subsubsection{Observations}
+% elaborate on the observed results
+
+ This is shown on Figure 1, left. But our algorithm maximizes the average reward per action not by kilometer, the experiment also clearly shows shows improvement by this metric : one a $250$ actions sample we have : 
+ \begin{align*}
+	 \textit{A total profit of $9926295$ (average / action : $39705.180$)} && \textit{for the reactive agent} \\
+	 \textit{A total profit of $7987058$ (average / action : $31948.232$)} && \textit{for the dummy agent} 
+ \end{align*}
+ Our system is showing a $24,27\%$ improvement compared to the dummy base case.
+ 
+ \subsubsection{Setting}
+  
+
+\subsection{Experiment 2: Discount factor}
 % the purpose of this experiment is to understand how the discount factor influences the result
 
 \subsubsection{Setting}
@@ -89,23 +116,5 @@ where $A$ is the set of actions. Note that this algorithms terminates since the 
 
 \subsubsection{Observations}
 % you describe the experimental results and the conclusions you inferred from these results
-
-\subsection{Experiment 2: Comparisons with dummy agents}
-% you compare the results of your agent with two dummy agents: the random agent that was already given in the starter files and another dummy agent that you define and create. You should report the results from the simulations using the topologies given in the starter files and optionally, additional topologies that you create.
-
-\subsubsection{Setting}
-% you describe how you perform the experiment and you describe the dummy agent you created (you also need to specify the configuration used for the experiment)
-
-\subsubsection{Observations}
-% elaborate on the observed results
-
-\vdots
-
-\subsection{Experiment n}
-% other experiments you would like to present
-
-\subsubsection{Setting}
-
-\subsubsection{Observations}
 
 \end{document}
